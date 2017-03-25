@@ -93,7 +93,7 @@ class Address(object):
                 @TODO: Raise if no private key provided.
         """
         if self.__private_key is not None:
-            return self.__private_key.sign(message).encode('hex')
+            return self.__private_key.sign_deterministic(message).encode('hex')
 
         return None
 
