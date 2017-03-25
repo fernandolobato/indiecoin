@@ -1,13 +1,10 @@
-import os
-
-from .. import util
 from .. util import ecdsa
 from .. util.ecdsa.keys import BadSignatureError
 
 
 class Address(object):
     """ Class to use eliptic curve asymetric keys.
-        
+
         This class is a wrapper over pythons implementation of ECDSA.
         Allows us to generate a key pair, load a key from an hexadecimal
         representation or verify a signature given a message, public key
@@ -50,14 +47,18 @@ class Address(object):
         self.__public_key = public_key
 
         if self.__public_key:
-            self.__public_key = ecdsa.VerifyingKey.from_string(public_key.decode('hex'), curve=ecdsa.NIST521p)
+            self.__public_key = ecdsa.VerifyingKey.from_string(
+                public_key.decode('hex'),
+                curve=ecdsa.NIST521p)
 
         if self.__private_key:
-            self.__private_key = ecdsa.SigningKey.from_string(private_key.decode('hex'), curve=ecdsa.NIST521p)
-            self.__public_key = self.__private_key.get_verifying_key()            
+            self.__private_key = ecdsa.SigningKey.from_string(
+                private_key.decode('hex'),
+                curve=ecdsa.NIST521p)
+            self.__public_key = self.__private_key.get_verifying_key()
 
         if not self.__private_key and not self.__public_key:
-            self.__private_key = ecdsa.SigningKey.generate(curve=ecdsa.NIST521p) 
+            self.__private_key = ecdsa.SigningKey.generate(curve=ecdsa.NIST521p)
             self.__public_key = self.__private_key.get_verifying_key()
 
     @property
@@ -73,7 +74,7 @@ class Address(object):
     @property
     def public_key(self):
         """ Function to get the Hexadecimal representation of a ECDSA public key.
-            
+
             Returns
             -------
             Hexadecimal representation of public key.
@@ -99,7 +100,7 @@ class Address(object):
     def verify_signature(self, signature, message):
         """
             Verifies that a signature was made with a specific key pair.
-            
+
             Catches BadSignatureError if signature is not valid.
 
             Returns
