@@ -1,0 +1,113 @@
+[
+    {
+        "table_name" : "ic_transaction",
+
+        "fields" : 
+
+            [
+                {"name" : "id", "type" : "INTEGER PRIMARY KEY"},
+                
+                {"name" : "hash", "type" : "CHAR(64)"},
+
+                {"name" : "num_inputs", "type" : "INTEGER"},
+
+                {"name" : "num_outputs", "type" : "INTEGER"},
+
+                {"name" : "timestamp", "type" : "INTEGER"},
+
+                {"name" : "is_coinbase", "type": "INTEGER"},
+
+                {"name" : "is_orphan", "type": "INTEGER"},
+
+                {"name": "block_id", "type": "INTEGER"},
+
+                {"name": "block_hash", "type":"CHAR(64)"}
+
+            ],
+
+        "constraints": 
+            [
+                {"name":"FOREIGN KEY(block_id) REFERENCES block(id)"}
+            ]
+    },
+
+    {
+        "table_name" : "transaction_output",
+
+        "fields" : 
+            [
+               {"name" : "id", "type" : "INTEGER PRIMARY KEY"},
+
+               {"name" : "id_transaction", "type" : "INTEGER"},
+               
+               {"name" : "public_key_owner", "type" : "TEXT"},
+
+               {"name" : "unspent", "type" : "INTEGER"},
+
+               {"name": "amount", "type" : "FLOAT"} 
+            ],
+
+        "constraints" : 
+            [
+                {"name" : " FOREIGN KEY(id_transaction) REFERENCES transaction_output(id)"}
+            ]
+    },
+
+    {
+        "table_name" : "transaction_input",
+
+        "fields" :
+            [
+                {"name" : "id", "type" : "INTEGER PRIMARY KEY"},
+
+                {"name" : "id_transaction", "type": "INTEGER"},
+
+                {"name" : "hash_transaction", "type": "CHAR(64)" },
+
+                {"name" : "signature", "type": "TEXT"},
+
+                {"name": "prev_out_index", "type": "TEXT"}
+            ],
+
+        "constraints": 
+            [
+                {"name" : " FOREIGN KEY (id_transaction) REFERENCES transaction_output(id)"}
+            ]
+    },
+
+    {
+        "table_name" : "block",
+
+        "fields" :
+            [
+                {"name" : "id", "type": "INTEGER PRIMARY KEY"},
+
+                {"name": "previous_block_id", "type" : "INTEGER"},
+
+                {"name" : "hash", "type" : "CHAR(64)"},
+
+                {"name" : "previous_block_hash", "type": "CHAR(64)"},
+
+                {"name" : "num_transactions", "type": "INTEGER"},
+
+                {"name" : "nonce", "type": "INTEGER"},
+
+                {"name" : "timestamp", "type": "INTEGER"},
+
+                {"name" : "difficulty", "type": "INTEGER"},
+
+                {"name" : "hash_merkle_root", "type": "CHAR(64)"},
+
+                {"name" : "is_orphan", "type": "INTEGER"},
+
+                {"name" : "height", "type": "INTEGER"}
+
+            ],
+
+        "constraints": 
+            [
+                {"name" : " FOREIGN KEY (previous_block_id) REFERENCES block(id)"}
+            ]
+    }
+]
+

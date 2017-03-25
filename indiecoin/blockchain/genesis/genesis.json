@@ -1,0 +1,39 @@
+{
+    "block":
+        {
+            "id": "1",
+            "previous_block_id": "0",
+            "hash": "1465242b9a4e246136f1d76344d625efff9acb6b33525eed1c1373b9225a21c2",
+            "previous_block_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "num_transactions": "",
+            "nonce": "",
+            "timestamp": "1489368780", 
+            "difficulty": "",
+            "hash_merkle_root": "",
+            "is_orphan": "0",
+            "height": "1"
+        },
+
+    "ic_transaction":
+        {
+            "id": "1",
+            "hash": "7ed1537f0ed307693b675c7b6067d7044624be91ad339b577c094d6b37bb00d8",
+            "num_inputs": "0",
+            "num_outputs": "1",
+            "timestamp": "1489368774",
+            "is_coinbase": "1",
+            "is_orphan": "0",
+            "block_id": "1",
+            "block_hash": "1465242b9a4e246136f1d76344d625efff9acb6b33525eed1c1373b9225a21c2"
+
+        },
+
+    "transaction_output" :
+        {
+            "id": "1",
+            "id_transaction": "1",
+            "public_key_owner": "005ec5005a6e1dc0fad36333b839f5351190090cd3ed57879a0b664f1504fe04f108e586112033129ddb28653f0289f417c354cb358df7adb9ca4a8007777daedd5d01e0b49e11e51dce33063c0241f03ed0afa5f1e11a577b96e580fec6c1cc9f047c22b9881da9bbf9818f00a69005607d72b75d42f954621df4591f56a246fdda3837",
+            "unspent" : "1",
+            "amount": "50"
+        }
+}

@@ -4,10 +4,10 @@ exclude =
     __pycache__,
     ./indiecoin/util/ecdsa,
     ./indiecoin/node/*,
-    ./indiecoin/blockchain/*,
+    ./indiecoin/blockchain/genesis/*,
+    ./indiecoin/blockchain/block.py,
     ./indiecoin/miner/*,
     ./indiecoin-node.py,
-    ./tests/test_transactions.py,
     ./tests/test_database.py,
     ./start.py,
     ./tests/context.py
