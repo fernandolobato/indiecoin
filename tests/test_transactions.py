@@ -15,7 +15,11 @@ class TransactionInputTestCase(unittest.TestCase):
         inside indeicoin.blockchain.transaction
     """
     def setUp(self):
-        """
+        """ Lookups genesis block and first transaction. Uses private key from genesis
+            block to generate address object. This will lookup in the normal database.
+            This should no affect since both database have the genesis block in them.
+
+            Starts a database connection to a test database.
         """
         self.block = indiecoin.blockchain.BlockChain().get_block(GENESIS_BLOCK_HASH)
 
@@ -41,7 +45,7 @@ class TransactionInputTestCase(unittest.TestCase):
         os.system('rm {}'.format(self.path))
 
     def test_create_tx_input_from_dict(self):
-        """
+        """ Create a TransactionInput object from dictionary data.
         """
         tx_input = transaction.TransactionInput(**self.tx_input_data)
 
@@ -51,14 +55,15 @@ class TransactionInputTestCase(unittest.TestCase):
         self.assertTrue(tx_input.validate_signature())
 
     def test_get_amount_previous_tx(self):
-        """
+        """ Get the amount of the TransactionOutput being referenced in
+            transaction input.
         """
         tx_input = transaction.TransactionInput(**self.tx_input_data)
         self.assertEqual(self.transaction.hash, tx_input.hash_transaction)
         self.assertEqual(tx_input.amount, 50)
 
     def test_create_from_json_string(self):
-        """
+        """ Create an TransactionInput object from a string JSON.
         """
         del self.tx_input_data['database']
         tx_input_data_string = json.dumps(self.tx_input_data)
@@ -68,10 +73,11 @@ class TransactionInputTestCase(unittest.TestCase):
 
 
 class TransactionOutputTestCase(unittest.TestCase):
-    """
+    """ Tests the functionality for TransactionOutput objects
+        inside indeicoin.blockchain.transaction
     """
     def setUp(self):
-        """
+        """ Initialized data.
         """
         self.tx_output_data = {
             'amount': 25,
@@ -80,7 +86,7 @@ class TransactionOutputTestCase(unittest.TestCase):
         }
 
     def test_create_tx_output_from_dict(self):
-        """
+        """ Generate TransactionOutput from dictionary data.
         """
         tx_output = transaction.TransactionOutput(**self.tx_output_data)
         expected = '{}-{}-True'.format(
@@ -96,6 +102,10 @@ class TransactionTestCase(unittest.TestCase):
     """ Generate new transaction referencing genesis transaction
     """
     def setUp(self):
+        """ Initialize database, lookup genesis block to create new
+            transaction making reference to the outputs of that
+            transaction.
+        """
         self.block = indiecoin.blockchain.BlockChain().get_block(GENESIS_BLOCK_HASH)
 
         self.transaction = self.block.transactions[0]
@@ -145,6 +155,8 @@ class TransactionTestCase(unittest.TestCase):
         os.system('rm {}'.format(self.path))
 
     def test_create_transaction(self):
+        """ Test creating a Transaction object from dictionary data.
+        """
         self.transaction_data.pop('database', None)
         trans = transaction.Transaction(**self.transaction_data)
         serialized_data = trans.serialize()
@@ -155,6 +167,8 @@ class TransactionTestCase(unittest.TestCase):
         self.assertTrue(trans.is_valid())
 
     def test_not_valid_transaction(self):
+        """ Test creating a not valid Transaction objet from dictionary data.
+        """
         change = self.transaction_data['tx_inputs'][0]['signature'].replace('1', '2')
         self.transaction_data['tx_inputs'][0]['signature'] = change
 
@@ -164,6 +178,8 @@ class TransactionTestCase(unittest.TestCase):
             self.assertEqual(e[0], 'Transaction not valid')
 
     def test_save_database(self):
+        """ Test saving a transaction object to database.
+        """
         trans = transaction.Transaction(**self.transaction_data)
         saved = trans.save()
         self.assertNotEqual(None, saved)
