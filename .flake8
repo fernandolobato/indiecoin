@@ -5,9 +5,7 @@ exclude =
     ./indiecoin/util/ecdsa,
     ./indiecoin/node/*,
     ./indiecoin/blockchain/genesis/*,
-    ./indiecoin/blockchain/block.py,
     ./indiecoin/miner/*,
     ./indiecoin-node.py,
-    ./start.py,
     ./tests/context.py
 max-line-length=99

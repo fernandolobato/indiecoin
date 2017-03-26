@@ -5,7 +5,7 @@
             "previous_block_id": "0",
             "hash": "1465242b9a4e246136f1d76344d625efff9acb6b33525eed1c1373b9225a21c2",
             "previous_block_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-            "num_transactions": "",
+            "num_transactions": "1",
             "nonce": "",
             "timestamp": "1489368780", 
             "difficulty": "",

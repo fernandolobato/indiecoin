@@ -4,6 +4,7 @@ import sqlite3
 import os
 
 from context import indiecoin, GENESIS_BLOCK_HASH
+from indiecoin.blockchain.database import Database
 from indiecoin.util import default_data_directory
 
 
@@ -20,7 +21,7 @@ class DatabaseTestCase(unittest.TestCase):
         """
         self.file_name = 'test_database'
         self.path = os.path.join(default_data_directory(), self.file_name)
-        self.database = indiecoin.blockchain.database.Database(file_name=self.file_name)
+        self.database = Database(file_name=self.file_name)
         self.connection = sqlite3.connect(self.path)
         self.genesis_block = GENESIS_BLOCK_HASH
 

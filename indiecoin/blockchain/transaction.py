@@ -108,6 +108,10 @@ class Transaction(object):
     def is_valid(self):
         """ Checks that a transaction is valid.
 
+            @TODO:
+                Check coinbase amount is less than or equal to the
+                sum of fees and reward.
+
             Performs the following checks:
 
                 - The sum of inputs most be less than or equal to
@@ -118,6 +122,10 @@ class Transaction(object):
 
                 - The signature for each input presented most match
                 the public key stored in the output it represents.
+
+                - Checks that if the transaction has no inputs its
+                a coinbase transaction.
+
         """
         input_total = 0
         output_total = 0
@@ -126,6 +134,9 @@ class Transaction(object):
             return False
 
         if self.num_outputs != len(self.tx_outputs):
+            return False
+
+        if self.num_inputs == 0 and not self.is_coinbase:
             return False
 
         for tx_input in self.tx_inputs:
