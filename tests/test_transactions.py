@@ -13,6 +13,8 @@ from indiecoin.util import default_data_directory
 class TransactionInputTestCase(unittest.TestCase):
     """ Tests the functionality for TransactionInput objects
         inside indeicoin.blockchain.transaction
+
+        @TODO TESTS:
     """
     def setUp(self):
         """ Lookups genesis block and first transaction. Uses private key from genesis
@@ -21,15 +23,15 @@ class TransactionInputTestCase(unittest.TestCase):
 
             Starts a database connection to a test database.
         """
-        self.block = indiecoin.blockchain.BlockChain().get_block(GENESIS_BLOCK_HASH)
-
-        self.transaction = self.block.transactions[0]
-        self.address = indiecoin.wallet.address.Address(private_key=PRIVATE_KEY_GENESIS)
-
         self.file_name = 'test_database'
         self.path = os.path.join(default_data_directory(), self.file_name)
         self.database = transaction.Database(file_name=self.file_name)
-        self.connection = sqlite3.connect(self.path)
+        self.block_database = indiecoin.blockchain.block.Database(file_name=self.file_name)
+
+        self.block = indiecoin.blockchain.BlockChain(database=self.block_database).get_block(GENESIS_BLOCK_HASH)
+
+        self.transaction = self.block.transactions[0]
+        self.address = indiecoin.wallet.address.Address(private_key=PRIVATE_KEY_GENESIS)
 
         self.tx_input_data = {
             'signature': self.address.sign(self.transaction.hash),
@@ -41,7 +43,6 @@ class TransactionInputTestCase(unittest.TestCase):
     def tearDown(self):
         """ Destroy database.
         """
-        self.connection.close()
         os.system('rm {}'.format(self.path))
 
     def test_create_tx_input_from_dict(self):
@@ -68,6 +69,7 @@ class TransactionInputTestCase(unittest.TestCase):
         del self.tx_input_data['database']
         tx_input_data_string = json.dumps(self.tx_input_data)
         tx_input_data = json.loads(tx_input_data_string)
+        tx_input_data['database'] = self.database
         tx_input = transaction.TransactionInput(**tx_input_data)
         self.assertTrue(tx_input.validate_signature())
 
@@ -106,14 +108,15 @@ class TransactionTestCase(unittest.TestCase):
             transaction making reference to the outputs of that
             transaction.
         """
-        self.block = indiecoin.blockchain.BlockChain().get_block(GENESIS_BLOCK_HASH)
-
-        self.transaction = self.block.transactions[0]
-        self.address = indiecoin.wallet.address.Address(private_key=PRIVATE_KEY_GENESIS)
-
         self.file_name = 'test_database'
         self.path = os.path.join(default_data_directory(), self.file_name)
         self.database = transaction.Database(file_name=self.file_name)
+        self.block_database = indiecoin.blockchain.block.Database(file_name=self.file_name)
+
+        self.block = indiecoin.blockchain.BlockChain(database=self.block_database).get_block(GENESIS_BLOCK_HASH)
+
+        self.transaction = self.block.transactions[0]
+        self.address = indiecoin.wallet.address.Address(private_key=PRIVATE_KEY_GENESIS)
 
         signature = self.address.sign(self.transaction.hash)
 
@@ -121,6 +124,7 @@ class TransactionTestCase(unittest.TestCase):
             'signature': signature,
             'hash_transaction': self.transaction.hash,
             'prev_out_index': '0',
+            'database': self.database
         }
 
         self.transaction_outputs = [
@@ -157,10 +161,10 @@ class TransactionTestCase(unittest.TestCase):
     def test_create_transaction(self):
         """ Test creating a Transaction object from dictionary data.
         """
-        self.transaction_data.pop('database', None)
         trans = transaction.Transaction(**self.transaction_data)
         serialized_data = trans.serialize()
         self.assertEqual(type(serialized_data), dict)
+        self.transaction_data.pop('database', None)
         self.assertEqual(len(serialized_data), len(self.transaction_data))
         self.assertEqual(type(trans.to_json()), str)
         self.assertEqual(len(str(trans)), 64)

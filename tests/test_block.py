@@ -9,20 +9,25 @@ from indiecoin.util import default_data_directory
 
 
 class BlockTestCase(unittest.TestCase):
-    """ Test the functionality for generating ECDSA key pairs.
+    """ Test the functionality for blocks
+
+        @TODO TESTS:
+
     """
     def setUp(self):
-        """
-        """
         """ Create database object with different file_name. Open connection to database.
+            Creates data dictionaries with transactions and blocks.
         """
-        self.block = indiecoin.blockchain.BlockChain().get_block(GENESIS_BLOCK_HASH)
-        self.transaction = self.block.transactions[0]
-        self.address = indiecoin.wallet.address.Address(private_key=PRIVATE_KEY_GENESIS)
-
         self.file_name = 'test_database'
         self.path = os.path.join(default_data_directory(), self.file_name)
         self.database = block.Database(file_name=self.file_name)
+        self.transaction_database = indiecoin.blockchain.transaction.Database(
+            file_name=self.file_name)
+        self.block = indiecoin.blockchain.BlockChain(database=self.database).get_block(
+            GENESIS_BLOCK_HASH)
+
+        self.transaction = self.block.transactions[0]
+        self.address = indiecoin.wallet.address.Address(private_key=PRIVATE_KEY_GENESIS)
 
         signature = self.address.sign(self.transaction.hash)
 
@@ -30,6 +35,7 @@ class BlockTestCase(unittest.TestCase):
             'signature': signature,
             'hash_transaction': self.transaction.hash,
             'prev_out_index': '0',
+            'database': self.transaction_database
         }
 
         self.transaction_outputs = [
@@ -55,13 +61,13 @@ class BlockTestCase(unittest.TestCase):
             'is_orphan': 0,
             'tx_inputs': [self.tx_input_data],
             'tx_outputs': self.transaction_outputs,
-            'database': self.database
+            'database': self.transaction_database
         }
 
         self.coin_base_output = {
             'amount': 5,
             'public_key_owner': PUBLIC_KEY_GENESIS,
-            'unspent': 1
+            'unspent': 1,
         }
 
         self.coin_base_transaction_data = {
@@ -74,7 +80,7 @@ class BlockTestCase(unittest.TestCase):
             'is_orphan': 0,
             'tx_inputs': [],
             'tx_outputs': [self.coin_base_output],
-            'database': self.database
+            'database': self.transaction_database
         }
 
         self.block_data = {
@@ -105,7 +111,7 @@ class BlockTestCase(unittest.TestCase):
         self.assertTrue(new_block.is_valid())
 
     def test_block_invalid_transaction(self):
-        """
+        """ Test trying to create a block with invalid transaction.
         """
         change = self.block_data['transactions'][0]['tx_inputs'][0]['signature'].replace('1', '2')
         self.block_data['transactions'][0]['tx_inputs'][0]['signature'] = change
@@ -116,7 +122,7 @@ class BlockTestCase(unittest.TestCase):
             self.assertEqual(e[0], 'Transaction not valid')
 
     def test_block_two_coinbase_transactions(self):
-        """
+        """ Test trying to create a block with two coinbase transactions.
         """
         coinbase = {
             'hash': '',
@@ -128,6 +134,7 @@ class BlockTestCase(unittest.TestCase):
             'is_orphan': 0,
             'tx_inputs': [],
             'tx_outputs': [self.coin_base_output],
+            'database': self.transaction_database
         }
 
         self.block_data['transactions'].append(coinbase)
@@ -138,13 +145,25 @@ class BlockTestCase(unittest.TestCase):
             self.assertEqual(e[0], 'Block is not valid')
 
     def test_incorrect_height(self):
-        """
+        """ Test trying to create a block with incorrect height
         """
         self.block_data['height'] += 10
         try:
             block.Block(**self.block_data)
         except AssertionError as e:
             self.assertEqual(e[0], 'Block is not valid')
+
+    def test_save_to_database(self):
+        """ Test saving a block to database.
+        """
+        new_block = block.Block(**self.block_data)
+        block_id = new_block.save()
+
+        self.assertNotEqual(block_id, None)
+        saved_block = indiecoin.blockchain.BlockChain(database=self.database).get_block(
+            new_block.hash)
+        self.assertEqual(new_block.hash, saved_block.hash)
+        self.assertEqual(len(new_block.transactions), len(saved_block.transactions))
 
 
 if __name__ == '__main__':

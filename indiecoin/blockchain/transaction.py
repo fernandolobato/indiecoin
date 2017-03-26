@@ -13,7 +13,7 @@ class Transaction(object):
         @TODO:
             Update when a transaction is spent.
 
-        This class will serve as an interphase to handel transactions. It
+        This class will serve as an interphase to handle transactions. It
         can recieve transaction information an structure it. Validates
         information inside a transaction and can serialize object or
         write to database.
@@ -67,7 +67,6 @@ class Transaction(object):
         self.is_orphan = True if int(kwargs['is_orphan']) == 1 else False
         self.tx_inputs = kwargs['tx_inputs']
         self.tx_outputs = kwargs['tx_outputs']
-
         self.tx_inputs = [TransactionInput(**tx_in) if type(tx_in) != TransactionInput else tx_in for tx_in in self.tx_inputs]
         self.tx_outputs = [TransactionOutput(**tx_out) if type(tx_out) != TransactionOutput else tx_out for tx_out in self.tx_outputs]
 
@@ -87,7 +86,7 @@ class Transaction(object):
             once the miner has found a correct hash for the block
             so each transaction can reference it later.
         """
-        self.__block_hash = block_hash
+        self.block_hash = block_hash
 
     def valid_hash(self):
         """ Calculates the valid hash for this transaction.
@@ -155,9 +154,12 @@ class Transaction(object):
 
         return True
 
-    def save(self):
+    def save(self, block_id=None):
         """ Saves a transaction along with its transaction inputs
             and outputs to local database.
+            
+            Transaction can recieve a block id to add it to data
+            dictionary and save.
 
             Returns
             -------
@@ -166,7 +168,10 @@ class Transaction(object):
                 None: None
                     In the case the object could not be saved.
         """
-        return self.__database.save_transaction(self.serialize())
+        tx_data = self.serialize()
+        if block_id:
+            tx_data['block_id'] = block_id
+        return self.__database.save_transaction(tx_data)
 
     def serialize(self):
         """ Serializes a transaction object into a dictionary representation.
@@ -323,10 +328,6 @@ class TransactionOutput(object):
         self.amount = int(kwargs['amount'])
         self.public_key_owner = kwargs['public_key_owner']
         self.unspent = True if kwargs['unspent'] == 1 else False
-        self.__database = kwargs.get('database')
-
-        if self.__database is None:
-            self.__database = Database()
 
     def serialize(self):
         """ Serializes a transaction object into a dictionary representation.
@@ -360,7 +361,6 @@ class Database(Database):
     """ Database Object abstraction for Transactions that
         will interact directly with the database.
     """
-
     def __init__(self, file_name=None):
         """ Constructor for transaction.Database calls super
             constructor.
@@ -389,6 +389,9 @@ class Database(Database):
 
             transaction['tx_inputs'] = inputs
             transaction['tx_outputs'] = outputs
+            [tx_in.update({'database': self}) for tx_in in transaction['tx_inputs']]
+        
+        transaction['database'] = self
 
         return Transaction(**transaction)
 
@@ -406,7 +409,9 @@ class Database(Database):
         for transaction in transactions:
             transaction['tx_inputs'] = self.__get_transaction_inputs(transaction['id'])
             transaction['tx_outputs'] = self.__get_transaction_outputs(transaction['id'])
+            [tx_in.update({'database': self}) for tx_in in transaction['tx_inputs']]
 
+        [tx.update({'database': self}) for tx in transactions]
         return [Transaction(**tx) for tx in transactions]
 
     def save_transaction(self, transaction):
