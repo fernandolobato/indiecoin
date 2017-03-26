@@ -10,6 +10,9 @@ from .database import Database
 class Transaction(object):
     """ Class Representing a Transaction instance.
 
+        @TODO:
+            Update when a transaction is spent.
+
         This class will serve as an interphase to handel transactions. It
         can recieve transaction information an structure it. Validates
         information inside a transaction and can serialize object or
