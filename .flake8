@@ -8,7 +8,6 @@ exclude =
     ./indiecoin/blockchain/block.py,
     ./indiecoin/miner/*,
     ./indiecoin-node.py,
-    ./tests/test_database.py,
     ./start.py,
     ./tests/context.py
 max-line-length=99
