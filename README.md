@@ -23,13 +23,20 @@ $ cd indiecoin/
 $ pip install -r requirements.txt
 ```
 
-The program is ready to use you can begin by running 
+The program is ready to use you can begin by running. To run a normal node just run the following command.
 ```
 $ python indiecoin-node.py --initial-peers 104.131.120.174:6666
 ```
+
 Wil begin a peer with a DNS seed pointing a server running an indiecoin. If the application is not in the server, you can just add the ip and port of any other peer running the client.
 
 A more detailed documentation of parameters will be seen below.
+
+To run a miner node just run with the --mine flag set to true. In the program by default its set to false.
+
+```
+python indiecoin-node.py  --initial-peers 104.131.120.174:6666 --mine True
+```
 
 ---
 
@@ -54,6 +61,8 @@ $ python -m unittest discover --pattern=*.py
 
 ## Documentation
 For documentation [numpy](https://github.com/numpy/numpy/blob/master/doc/example.py) documentation style was followed in a very slight way. All methods and classes have their respective docstrings.
+
+All the required documentation for the class can be found under the docs folder.
 
 ## Coding standard
 The project was done using [pep8](https://www.python.org/dev/peps/pep-0008/) coding standard. [flake8](https://pypi.python.org/pypi/flake8) was used as a linter to verify that the standard was being followed. To verify standar in project just navigate to root and type

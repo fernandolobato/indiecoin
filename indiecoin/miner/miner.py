@@ -6,7 +6,7 @@ from ..wallet.address import Address
 from ..util.hash import sha256d
 
 REWARD = 5
-DIFFICULTY = 2 ** (256 - 25)
+DIFFICULTY = 2 ** (256 - 21)
 
 class Miner(object):
 

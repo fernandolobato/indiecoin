@@ -1,1 +1,1 @@
-from .miner import *
+from miner import *
