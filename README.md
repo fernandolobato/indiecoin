@@ -1,8 +1,10 @@
 # Indiecoin
 
-IndieCoin is a vanilla implementation of a decentralized cryptocurrency. A cryptocurrency is a digital asset that can work as a medium of exchange using cryptographic principles to ensure security.
+IndieCoin is a vanilla implementation of a decentralized cryptocurrency. A cryptocurrency is a digital asset that can work as a medium of exchange using cryptographic principles to ensure security. 
 
-This is not a production project nor should it be used as an actual implementation of a cryptocurrencty. It is just a simple proof of concept of a blockchain. There are many security features not being considered and no optimization has been done.
+This is not a production project nor should it be used as an actual implementation of a cryptocurrencty. It is just a simple proof of concept of a blockchain. There are many security features not being considered and no optimization has been done. This project was done as second partial project for a software architecture class.
+
+
 
 ## Features
 
@@ -53,6 +55,17 @@ $ python -m unittest discover --pattern=*.py
 ## Libraries
 - [python ecdsa](https://github.com/warner/python-ecdsa)
 - [BerryTella P2P framework](ttp://cs.berry.edu/~nhamid/p2p/btpeer.py)
+
+## Documentation
+For documentation [numpy](https://github.com/numpy/numpy/blob/master/doc/example.py) documentation style was followed in a very slight way. All methods and classes have their respective docstrings.
+
+## Coding standard
+The project was done using [pep8](https://www.python.org/dev/peps/pep-0008/) coding standard. [flake8](https://pypi.python.org/pypi/flake8) was used as a linter to verify that the standard was being followed. To verify standar in project just navigate to root and type
+```
+$ flake8
+```
+If there are any errors in the style it will show it as output.
+flake8 configuration file can be found in the root of the repo.
 
 ### Todos
 
