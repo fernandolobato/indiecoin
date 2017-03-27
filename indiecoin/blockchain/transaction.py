@@ -3,8 +3,9 @@ import json
 from ..util.serialization import remove_dict_prefix
 from ..util.hash import sha256
 from ..wallet.address import Address
-
 from .database import Database
+
+REWARD = 5
 
 
 class Transaction(object):
@@ -36,6 +37,8 @@ class Transaction(object):
                 list of indiecoin.blockchain.transaction.TransactionInput objects
             tx_outputs: list[]
                 list of indiecoin.blockchain.transaction.TransactionOutput objects
+            miner_fee: float
+                value indicating difference in inputs vs outputs.
             __database: indiecoin.blockchain.transaction.database
                 instance of database on which to perform lookups and writeups.
 
@@ -70,6 +73,7 @@ class Transaction(object):
         self.tx_inputs = [TransactionInput(**tx_in) if type(tx_in) != TransactionInput else tx_in for tx_in in self.tx_inputs]
         self.tx_outputs = [TransactionOutput(**tx_out) if type(tx_out) != TransactionOutput else tx_out for tx_out in self.tx_outputs]
 
+        self.miner_fee = 0
         self.__database = kwargs.get('database')
 
         if self.__database is None:
@@ -149,7 +153,14 @@ class Transaction(object):
         for tx_output in self.tx_outputs:
             output_total += tx_output.amount
 
-        if input_total > output_total:
+        if not self.is_coinbase:
+            self.miner_fee += (input_total - output_total)
+
+        if self.is_coinbase:
+            if input_total + self.miner_fee + REWARD > output_total:
+                return False
+
+        if input_total > output_total and not self.is_coinbase:
             return False
 
         return True
@@ -212,7 +223,7 @@ class Transaction(object):
         data['tx_outputs'] = [tx.serialize() for tx in data['tx_outputs']]
         data['tx_inputs'] = [tx.serialize() for tx in data['tx_inputs']]
 
-        fields = ['__database']
+        fields = ['__database', 'miner_fee']
 
         [data.pop(field, None) for field in fields]
 

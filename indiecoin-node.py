@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 import argparse
 
-from indiecoin.node import IndieCoinNode
+from indiecoin.node.ic_node import IndieCoinNode
 from indiecoin.miner import Miner
 
 
 def main():
-    """
-    """
     parser = argparse.ArgumentParser(description="Indiecoin Tool")
 
     mining_group = parser.add_argument_group(title="Mining")
@@ -46,11 +44,12 @@ def main():
 
     args = parser.parse_args()
 
+    miner = None
+
     if args.mine:
         miner = Miner()
-        miner.start()
 
-    node = IndieCoinNode(args.max_peers, args.port)
+    node = IndieCoinNode(args.max_peers, args.port, miner)
 
     if args.initial_peers:
         for peer in args.initial_peers.split(','):

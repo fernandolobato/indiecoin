@@ -8,12 +8,17 @@ class IndieCoinPeer(bt_peer.BTPeer):
     BerryTella P2P framework.
     """
 
-    def __init__(self, maxpeers, serverport):
+    def __init__(self, maxpeers, serverport, miner=None, check_on_miner=None):
         """ Initializes the peer to support connections up to maxpeers number
         of peers, with its server listening on the specified port.
 
         """
-        bt_peer.BTPeer.__init__(self, maxpeers, serverport)
+        bt_peer.BTPeer.__init__(
+            self,
+            maxpeers,
+            serverport,
+            miner=miner,
+            check_on_miner=check_on_miner)
 
         self.addrouter(self.__router)
 

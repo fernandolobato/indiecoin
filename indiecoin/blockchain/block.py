@@ -99,12 +99,14 @@ class Block(object):
         """
         coinbase_transactions = 0
         if len(self.transactions) != self.num_transactions:
+            print("a")
             return False
 
         for tx in self.transactions:
             if tx.is_coinbase:
                 coinbase_transactions += 1
                 if coinbase_transactions > 1:
+                    print(coinbase_transactions)
                     return False
 
             if not tx.is_valid():

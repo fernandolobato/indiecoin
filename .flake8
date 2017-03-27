@@ -9,4 +9,4 @@ exclude =
     ./indiecoin/node/bt_peer.py,
     ./send_transaction.py,
     ./send_block.py,
-max-line-length=99
+max-line-length=139

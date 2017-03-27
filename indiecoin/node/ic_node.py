@@ -53,7 +53,12 @@ class IndieCoinNode(IndieCoinPeer):
             Add this requests types to the handlers from BTPeer.
 
         """
-        IndieCoinPeer.__init__(self, maxpeers, serverport)
+        IndieCoinPeer.__init__(
+            self,
+            maxpeers,
+            serverport,
+            miner=miner,
+            check_on_miner=self.__check_on_miner)
 
         self.miner = miner
         self.main_thread = threading.Thread(target=self.mainloop, args=[])
@@ -144,7 +149,9 @@ class IndieCoinNode(IndieCoinPeer):
     def __handle_relay_transaction(self, peer_connection, data):
         """ handles relay transaction. Recieves an incomming transaction
             from a peer. Validates transaction. If we already have that
-            transaction on queue or on database, we can discard it.
+            transaction on queue or on database, we can discard it. Also
+            discard if its coinbase, coinbase transactions should only
+            come with blocks.
 
             If we don't, we add it to our queue and we broadcast it to
             all of our peers, (except the one who sent it to us.)
@@ -157,7 +164,8 @@ class IndieCoinNode(IndieCoinPeer):
             self.__debug(e[0])
             return
 
-        if transaction in self.transactions_queue or transaction.exists():
+        if transaction in self.transactions_queue or \
+                transaction.exists() or transaction.is_coinbase:
             return
 
         if transaction.is_valid():
@@ -201,8 +209,7 @@ class IndieCoinNode(IndieCoinPeer):
         if not block.exists():
 
             if self.miner:
-                # MINER SHIT
-                pass
+                self.miner.interrupt()
 
             block.save()
 
@@ -214,6 +221,33 @@ class IndieCoinNode(IndieCoinPeer):
             for peer in self.get_peer_ids():
                 if peer != peer_connection.id:
                     self.connect_and_send(peer, protocol.RELAY_BLOCK, block.to_json(), None, False)
+
+            if self.miner:
+                self.miner.create_current_block(self.transactions_queue)
+                self.miner.begin_mining()
+
+    def __check_on_miner(self):
+        """ Checks if miner has found a new block to broadcast to the
+            network.
+        """
+        if self.miner:
+            if self.miner.found:  # We found block!
+                block_data = self.miner.get_current_block()
+                new_block = blockchain.block.Block(**block_data)
+                new_block.save()
+
+                for peer in self.get_peer_ids():
+                    self.connect_and_send(
+                        peer,
+                        protocol.RELAY_BLOCK,
+                        new_block.to_json(),
+                        None,
+                        False)
+
+                self.__debug('BROADCASTED')
+
+                self.miner.begin_mining()
+                self.miner.create_current_block(self.transactions_queue)
 
     def bootstrap(self):
         """ Bootstraps a node that just went online. After building a list
@@ -257,3 +291,7 @@ class IndieCoinNode(IndieCoinPeer):
 
             self.__debug('------ FINISH UPDATING BLOCKHAIN -------')
         self.__debug('----- BOOTSTRAP DONE --------')
+
+        if self.miner:
+            self.miner.start()
+            self.miner.create_current_block(self.transactions_queue)

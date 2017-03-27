@@ -23,7 +23,7 @@ class BTPeer:
     """
 
     #--------------------------------------------------------------------------
-    def __init__( self, maxpeers, serverport, myid=None, serverhost = None ):
+    def __init__( self, maxpeers, serverport, miner=None, check_on_miner=None, myid=None, serverhost = None ):
     #--------------------------------------------------------------------------
         """ Initializes a peer servent (sic.) with the ability to catalog
         information for up to maxpeers number of peers (maxpeers may
@@ -35,7 +35,8 @@ class BTPeer:
 
         """
         self.debug = 1
-
+        self.miner = miner
+        self.__check_on_miner = check_on_miner
         self.maxpeers = int(maxpeers)
         self.serverport = int(serverport)
         
@@ -379,9 +380,7 @@ class BTPeer:
 
 
 
-    #--------------------------------------------------------------------------
     def mainloop( self ):
-    #--------------------------------------------------------------------------
         s = self.makeserversocket( self.serverport )
 
         s.settimeout(2)
@@ -389,6 +388,10 @@ class BTPeer:
                   % ( self.myid, self.serverhost, self.serverport ) )
 
         while not self.shutdown:
+            if self.miner:
+                if self.__check_on_miner:
+                    self.__check_on_miner()
+
             try:
                 #self.__debug( 'Listening for connections...' )
                 clientsock, clientaddr = s.accept()
@@ -400,6 +403,8 @@ class BTPeer:
             except KeyboardInterrupt:
                 print 'KeyboardInterrupt: stopping mainloop'
                 self.shutdown = True
+                if miner:
+                    self.miner.shutdown()
                 sys.exit()
                 break
             except:
