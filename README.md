@@ -4,10 +4,6 @@ IndieCoin is a vanilla implementation of a decentralized cryptocurrency. A crypt
 
 This is not a production project nor should it be used as an actual implementation of a cryptocurrencty. It is just a simple proof of concept of a blockchain. There are many security features not being considered and no optimization has been done. This project was done as second partial project for a software architecture class.
 
-
-
-## Features
-
 ---
 ## Install
 ### Requirements
