@@ -28,7 +28,8 @@ class TransactionInputTestCase(unittest.TestCase):
         self.database = transaction.Database(file_name=self.file_name)
         self.block_database = indiecoin.blockchain.block.Database(file_name=self.file_name)
 
-        self.block = indiecoin.blockchain.BlockChain(database=self.block_database).get_block(GENESIS_BLOCK_HASH)
+        self.block = indiecoin.blockchain.BlockChain(
+            database=self.block_database).get_block(GENESIS_BLOCK_HASH)
 
         self.transaction = self.block.transactions[0]
         self.address = indiecoin.wallet.address.Address(private_key=PRIVATE_KEY_GENESIS)
@@ -113,7 +114,8 @@ class TransactionTestCase(unittest.TestCase):
         self.database = transaction.Database(file_name=self.file_name)
         self.block_database = indiecoin.blockchain.block.Database(file_name=self.file_name)
 
-        self.block = indiecoin.blockchain.BlockChain(database=self.block_database).get_block(GENESIS_BLOCK_HASH)
+        self.block = indiecoin.blockchain.BlockChain(
+            database=self.block_database).get_block(GENESIS_BLOCK_HASH)
 
         self.transaction = self.block.transactions[0]
         self.address = indiecoin.wallet.address.Address(private_key=PRIVATE_KEY_GENESIS)

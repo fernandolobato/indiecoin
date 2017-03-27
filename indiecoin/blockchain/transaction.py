@@ -154,10 +154,26 @@ class Transaction(object):
 
         return True
 
+    def exists(self):
+        """ Checks if current transaction already exists in the database.
+
+            Returns
+            -------
+                exists : boolean value
+                    boolean indicating if transaction exists in database.
+        """
+        db_transaction = self.__database.get_transaction(self.hash)
+        if db_transaction is not None:
+            return True
+        return False
+
     def save(self, block_id=None):
         """ Saves a transaction along with its transaction inputs
             and outputs to local database.
-            
+
+            @TODO:
+                Implement Update
+
             Transaction can recieve a block id to add it to data
             dictionary and save.
 
@@ -168,6 +184,9 @@ class Transaction(object):
                 None: None
                     In the case the object could not be saved.
         """
+        if self.exists():
+            raise NotImplemented('No update Implemented')
+
         tx_data = self.serialize()
         if block_id:
             tx_data['block_id'] = block_id
@@ -381,7 +400,7 @@ class Database(Database):
         """
         transaction = self.__get_transaction(hash_trans)
 
-        if transaction[0]:
+        if len(transaction):
 
             transaction = transaction[0]
             inputs = self.__get_transaction_inputs(transaction['id'])
@@ -390,10 +409,11 @@ class Database(Database):
             transaction['tx_inputs'] = inputs
             transaction['tx_outputs'] = outputs
             [tx_in.update({'database': self}) for tx_in in transaction['tx_inputs']]
-        
-        transaction['database'] = self
 
-        return Transaction(**transaction)
+            transaction['database'] = self
+
+            return Transaction(**transaction)
+        return None
 
     def get_block_transactions(self, block_hash):
         """ Gets all the transactions belonging to a block

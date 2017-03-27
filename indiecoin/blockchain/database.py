@@ -151,7 +151,8 @@ class Database(object):
         return self.__query(sql)
 
     def __query(self, sql):
-        self.__connection.row_factory = lambda c, r: dict([(col[0], r[idx]) for idx, col in enumerate(c.description)])
+        self.__connection.row_factory = lambda c, r: dict(
+            [(col[0], r[idx]) for idx, col in enumerate(c.description)])
         cursor = self.__connection.cursor()
         cursor.execute(sql)
         data = cursor.fetchall()

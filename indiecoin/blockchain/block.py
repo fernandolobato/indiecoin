@@ -15,7 +15,7 @@ class Block(object):
         we need to deal with a block we can turn its data into this object
         where we can deal with all the logic. Validates information inside
         a block and serializes if.
-        
+
         Attributtes
         -----------
 
@@ -50,7 +50,7 @@ class Block(object):
             Raises
             ------
                 AssertionError:
-                    if block is not valid (see is_valid() function) 
+                    if block is not valid (see is_valid() function)
         """
         self.hash = kwargs['hash']
         self.timestamp = kwargs['timestamp']
@@ -121,6 +121,19 @@ class Block(object):
 
         return True
 
+    def exists(self):
+        """ Checks if current block already exists in the database.
+
+            Returns
+            -------
+                exists : boolean value
+                    boolean indicating if block exists in database.
+        """
+        db_block = self.__database.get_block(self.hash)
+        if db_block is not None:
+            return True
+        return False
+
     def save(self):
         """ Saves a block object to the database.
 
@@ -128,21 +141,27 @@ class Block(object):
             saves block to database and then save each transaction
             making reference to the newly created block.
 
+            @TODO:
+                Implement update on exists
+
             Returns
             -------
                 block_id: int or None
                     id of  newly created block or None if could not
                     be saved.
         """
+        if self.exists():
+            raise NotImplemented('No update Implemented')
+
         block_data = self.serialize()
         [block_data.pop(field, None) for field in ['transactions']]
-        
+
         block_id = self.__database.save_block(block_data)
 
         if block_id:
-            for transaction in self.transactions:
-                transaction.set_block_hash(self.hash)
-                transaction.save(block_id=block_id)
+            for tx in self.transactions:
+                tx.set_block_hash(self.hash)
+                tx.save(block_id=block_id)
 
         return block_id
 
@@ -194,7 +213,8 @@ class Database(Database):
             return None
 
         block = block[0]
-        transactions = transaction.Database(file_name=self.file_name).get_block_transactions(block['hash'])
+        transactions = transaction.Database(
+            file_name=self.file_name).get_block_transactions(block['hash'])
         block['transactions'] = transactions
         block['database'] = self
         return Block(**block)

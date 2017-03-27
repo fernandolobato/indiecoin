@@ -4,7 +4,7 @@ from . import block
 class BlockChain(object):
     """ Blockchain interhpase to query items directly
         to the blockchain without touching directly object.
-        
+
         Performs basic query operations on blockhain. Can
         get a block, can get the height or can get a transaction.
 
@@ -20,7 +20,7 @@ class BlockChain(object):
 
             Can receive a database object to query at specific database.
             If None is receieved, created a new instance which will
-            point to default database. 
+            point to default database.
         """
         self._blocks = database
 
@@ -59,12 +59,12 @@ class BlockChain(object):
 
     def get_transaction(self, transaction_hash):
         """ Returns a transaction by its hash
-            
-            @TODO: Implement
+
+            @TODO: CUSTOM DATABASE
 
             Returns
             -------
                 transaction: indiecoin.blockchain.transaction.Transaction
                     transaction object for specified hash.
         """
-        raise NotImplemented('Not yet implemented')
+        return block.transaction.Database().get_transaction(transaction_hash)

@@ -3,9 +3,10 @@ exclude =
     .git,
     __pycache__,
     ./indiecoin/util/ecdsa,
-    ./indiecoin/node/*,
     ./indiecoin/blockchain/genesis/*,
     ./indiecoin/miner/*,
-    ./indiecoin-node.py,
-    ./tests/context.py
+    ./tests/context.py,
+    ./indiecoin/node/bt_peer.py,
+    ./send_transaction.py,
+    ./send_block.py,
 max-line-length=99
